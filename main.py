@@ -1,3 +1,6 @@
+import json,subprocess
+
+
 from botocore.exceptions import NoCredentialsError
 import tarfile, boto3, os
 
@@ -34,7 +37,7 @@ def download_s3_bucket(bucket_name, local_directory):
 def list_files(dir):
     try:
         # List all files in the specified directory
-        files = [f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
+        files = ["/tmp/"+f for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]
 
         if files:
             print(files)
@@ -75,12 +78,24 @@ def list_objects_in_bucket(bucket_name):
         print("AWS credentials not available.")
 
 
-# # Example usage:
-bucket_name = 'testbucket007tbd'
-local_directory = './temp_dir'
-target = 'compressed_data_1_3.tar.gz'
-download_s3_bucket(bucket_name, local_directory)
-files = list_files(local_directory)
-file_compression(target, files)
-upload_file_to_s3(target, bucket_name)
-list_objects_in_bucket(bucket_name)
+
+def lambda_handler(event, context):
+    # TODO implement
+    # # Example usage:
+    bucket_name = 'testbucket007tbd'
+    local_directory = '/tmp'
+    target = '/tmp/compressed_data_1_3.tar.gz'
+    download_s3_bucket(bucket_name, local_directory)
+    files = list_files(local_directory)
+    file_compression(target, files)
+    command = 'chmod 755 /tmp/compressed_data.tar.gz'
+    subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+    upload_file_to_s3(target, bucket_name)
+    list_objects_in_bucket(bucket_name)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from Lambda!')
+    }
+
+
