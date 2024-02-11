@@ -12,6 +12,15 @@ def file_compression(target, sources):
 
     print(f"Compression complete. Archive saved as: {target}")
 
+def decompress_tarfile(input_tar_path, output_folder):
+    try:
+        with tarfile.open(input_tar_path, 'r') as tar:
+            # Extract all contents of the tar file to the output directory
+            tar.extractall(output_folder)
+
+        print(f'Successfully decompressed {input_tar_path} to {output_folder}')
+    except Exception as e:
+        print(f'Error: {e}')
 
 def download_s3_bucket(bucket_name, local_directory):
     s3 = boto3.client('s3')
